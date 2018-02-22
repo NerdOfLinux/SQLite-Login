@@ -1,7 +1,8 @@
 <?php
+include_once("info.php");
 //Create function to use
 //Define db location
-$location="users.db";
+$location=$DB_location;
 //Function to connect to DB
 function openDB(){
      global $location;

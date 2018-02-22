@@ -1,3 +1,6 @@
+<?php
+include_once("info.php");
+?>
 <html>
 <head>
      <title> Verify Email </title>

@@ -1,7 +1,10 @@
+<?php
+include_once("info.php");
+?>
 <form name="login" action="" method="post">
 <pre>
-Email:    <input type="email" name="email" id="email" placeholder="bob@example.com" required value="bob@example.com">
-Password: <input type="password" name="password" id="password" required value="abc123">
+Email:    <input type="email" name="email" id="email" placeholder="bob@example.com" required>
+Password: <input type="password" name="password" id="password" required>
 <button type="submit" name="loginButton"> Sign Up </button>
 </pre>
 </form>

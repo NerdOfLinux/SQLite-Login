@@ -1,9 +1,12 @@
+<?php
+include_once("info.php");
+?>
 <form name="signup" action="" method="post">
 <pre>
-Username: <input type="text" name="username" id="username" placeholder="unicorns101" required value="bob">
-Email:    <input type="email" name="email" id="email" placeholder="example@example.com" required value="bob@example.com">
-Password: <input type="password" name="password" id="password" required value="abc123">
-Verify:   <input type="password" name="verify" id="password" required value="abc123">
+Username: <input type="text" name="username" id="username" placeholder="unicorns101" required>
+Email:    <input type="email" name="email" id="email" placeholder="example@example.com" required>
+Password: <input type="password" name="password" id="password" required>
+Verify:   <input type="password" name="verify" id="password" required>
 <button type="submit" name="signupButton"> Sign Up </button>
 </pre>
 </form>
@@ -32,8 +35,13 @@ if(checkPending($email) || checkUsers($email)){
 $passwordHash=password_hash("$password", PASSWORD_DEFAULT);
 $randcode=addPending($username, $email, $passwordHash);
 if(isset($randcode)){
-     $url="/verify.php?code=$randcode";
-     echo "$url";
+     $url="http://$domain/verify.php?code=$randcode";
+     $verify_link="<a href=\"$url\"> verify your email.</a>";
+     $styles="font-family: Arial;font-size: 14px;";
+     $message="<html><body><span style=\"$styles\"><h1>Welcome to $domain!</h1><p>Your account is almost set-up, but there is one last step you need to complete! Simply $verify_link <p> Link not working? No prboblem, just copy and paste: $url<br><p>Sincerely,<br>The people over at $domain</span></body></html>";
+     $headers="From: $from_email\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n";
+     mail("$email", "Verify your email($domain)", $message, $headers);
+     echo "An email has been sent to $email";
 }else{
      echo "<br> <h3> Sorry, an error occured, please try again later </h3>";
 }

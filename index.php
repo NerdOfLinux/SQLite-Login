@@ -1,3 +1,6 @@
+<?php
+include_once("info.php");
+?>
 <html>
 <head>
      <title> Simple Login </title>

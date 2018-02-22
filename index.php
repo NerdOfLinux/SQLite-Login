@@ -13,7 +13,7 @@ if($action=="login"){
 }else if($action=="signup"){
      include("signup.php");
 }else{
-     echo "<br> <h3> No action given </h3>";
+     echo "<p> No action given. You can: <ul> <li><a href='?action=login'> Log in </a> </li> <li><a href='?action=signup'> Sign Up </a></li></ul>";
 }
 ?>
 </body>

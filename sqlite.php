@@ -1,6 +1,21 @@
 <?php
 include_once("info.php");
-//Create function to use
+//Create functions to user
+//Caching
+function checkUserCache($email){
+     $dir="userCache";
+     $cacheFile="$dir/$email";
+     $output="";
+     if(is_file($cacheFile)){
+          $output=json_decode(file_get_contents($cacheFile), true);
+     }
+     return $output;
+}
+function createUserCache($email, $info){
+     $dir="userCache";
+     $cacheFile="$dir/$email";
+     file_put_contents("$cacheFile", json_encode($info));
+}
 //Define db location
 $location=$DB_location;
 //Function to connect to DB
@@ -24,10 +39,19 @@ function addUser($userName, $email, $password){
 }
 //Check user
 function checkCreds($email, $password){
+     if($caching=="yes"){
+          $cached=checkUserCache($email);
+          if(!empty($cached)){
+               return $cached;
+          }
+     }
      $query="SELECT * FROM users WHERE email=\"$email\"";
      $db=openDB();
      $result=$db->query($query);
      $result=$result->fetchArray();
+     if($caching=="yes"){
+          createUserCache($email, $result);
+     }
      closeDB($db);
      return $result;
 }

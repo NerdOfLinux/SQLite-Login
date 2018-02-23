@@ -35,7 +35,11 @@ if(checkPending($email) || checkUsers($email)){
 $passwordHash=password_hash("$password", PASSWORD_DEFAULT);
 $randcode=addPending($username, $email, $passwordHash);
 if(isset($randcode)){
-     $url="http://$domain/verify.php?code=$randcode";
+     if(!empty($accountDir)){
+          $url="http://$domain/$accountDir/verify.php?code=$randcode";
+     else{
+          $url="http://$domain/verify.php?code=$randcode";
+     }
      $verify_link="<a href=\"$url\"> verify your email.</a>";
      $styles="font-family: Arial;font-size: 14px;";
      $message="<html><body><span style=\"$styles\"><h1>Welcome to $domain!</h1><p>Your account is almost set-up, but there is one last step you need to complete! Simply $verify_link <p> Link not working? No prboblem, just copy and paste: $url<br><p>Sincerely,<br>The people over at $domain</span></body></html>";

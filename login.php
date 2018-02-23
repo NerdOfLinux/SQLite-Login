@@ -1,4 +1,5 @@
 <?php
+session_start();
 include_once("info.php");
 ?>
 <form name="login" action="" method="post">
@@ -24,6 +25,7 @@ $passwordHash=$creds['password'];
 $username=$creds['username'];
 if(password_verify($password, $passwordHash)){
      echo "Congrats! Your user name is: $username";
+     $_SESSION['loggedIn']=true;
 }else{
      echo "Drat! Wrong password or email.";
 }

@@ -26,7 +26,7 @@ if("$password" != "$verify"){
      echo "<br> <h3> Passwords do not match, please try again</h3>";
 }
 //Insert into pending DB
-include("sqlite.php");
+include("$DB_type.php");
 //Unless the user already exists
 if(checkPending($email) || checkUsers($email)){
      echo "<br> <h3> Sorry, the user already exists </h3>";

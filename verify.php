@@ -7,7 +7,7 @@ include_once("info.php");
 </head>
 <body>
 <?php
-include("sqlite.php");
+include("$DB_type.php");
 $code=urldecode($_GET['code']);
 $check=checkCode($code);
 if(empty($check)){

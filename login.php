@@ -18,7 +18,7 @@ if(!isset($_POST['loginButton'])){
 $email=$_POST['email'];
 $password=$_POST['password'];
 //Check against DB
-include("sqlite.php");
+include("$DB_type.php");
 $creds=checkCreds($email, $password);
 $passwordHash=$creds['password'];
 $username=$creds['username'];

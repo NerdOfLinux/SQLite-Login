@@ -3,7 +3,7 @@
 ## Setup:
 Run in terminal:
 ```bash
-sqlite3 users.db
+sqlite3 .ht.users.db
 ```
 In SQLite:
 ```sql

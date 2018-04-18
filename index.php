@@ -169,7 +169,10 @@ Verify:   <input type="password" name="verify" id="password" required>
 	}else{
 	     echo "<br> <h3> Sorry, there was an error creating the account. Please try again later.";
 	}
-
+}else if($action=="logout"){
+	unset($_SESSION['loggedIn']);
+	unset($_SESSION['userName']);
+	echo "You're now logged out!";
 }else{
 	$form='
 <form name="login" action="" method="post">
@@ -180,6 +183,13 @@ Password: <input type="password" name="password" id="password" required>
 </pre>
 </form>
 ';
+	if($_SESSION['loggedIn']){
+		$username=$_SESSION['userName'];
+		echo "You're already logged in, $username<br>";
+		echo "<a href='?action=logout'> Log out </a>";
+		echo "</body></html>";
+		exit;
+	}
 	echo $form;
 	echo "<a href='?action=signup'> Create an account </a><br>";
 	//Only do stuff if the sign up button is pressed
@@ -196,6 +206,7 @@ Password: <input type="password" name="password" id="password" required>
 	if(password_verify($password, $passwordHash)){
 	     echo "Congrats! Your user name is: $username";
 	     $_SESSION['loggedIn']=true;
+		$_SESSION['userName']=$username;
 	}else{
 	     echo "Drat! Wrong password or email.";
 	}

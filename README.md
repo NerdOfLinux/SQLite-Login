@@ -3,6 +3,7 @@
 ## Setup:
 Run in terminal:
 ```bash
+wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Login/master/index.php -O account.php
 sqlite3 .ht.users.db
 ```
 In SQLite:
@@ -19,4 +20,4 @@ INSERT INTO users (username, email, password) VALUES(\"$userName\", \"$email\", 
 so you're free to add additional columns without breaking anything(credits, registration date, etc.)
 
 # This is NOT yet ready to be used on a real site
-This is in pre-alpha stages, and does not even set session variables yet. 
+This is in pre-alpha stages, and will likely break a lot.

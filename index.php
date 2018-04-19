@@ -36,8 +36,8 @@ function addUser($userName, $email, $password){
      return $status;
 }
 //Check user
-function checkCreds($email, $password){
-     $query="SELECT * FROM users WHERE email=\"$email\"";
+function checkCreds($email){
+     $query="SELECT rowid,* FROM users WHERE email=\"$email\"";
      $db=openDB();
      $result=$db->query($query);
      $result=$result->fetchArray();
@@ -104,6 +104,20 @@ function checkCode($code){
      $result=$db->query($query);
      $result=$result->fetchArray();
      return $result;
+}
+function updatePass($oldPass, $newPass, $id){
+	$query1="SELECT password FROM users WHERE rowid=$id";
+	$db=openDB();
+	$result=$db->query($query1);
+	$result=$result->fetchArray();
+	if(password_verify($oldPass, $result['password'])){
+		$password=password_hash($newPass, PASSWORD_DEFAULT);
+		$query2="UPDATE users SET password='$password' WHERE rowid=$id";
+		$status=$db->exec($query2);
+	}else{
+		$status=false;
+	}
+	return $status;
 }
 //Get action
 $action=$_GET['action'];
@@ -173,6 +187,41 @@ Verify:   <input type="password" name="verify" id="password" required>
 	unset($_SESSION['loggedIn']);
 	unset($_SESSION['userName']);
 	echo "You're now logged out!";
+}else if($action=="dashboard"){
+	if(!$_SESSION['loggedIn']){
+		exit();
+	}
+	$username=$_SESSION['userName'];
+	$id=$_SESSION['id'];
+	echo "Your username: $username<br>";
+	echo "Your ID: $id<br>";
+	echo "<a href='?action=logout'> Log out </a>";
+	echo "<br>Change your password: <br>";
+	$form='
+<form action="" method="post" name="updatePass">
+<pre>
+Current: <input type="password" name="oldPass" required>
+New:     <input type="password" name="newPass1" required>
+Verify:  <input type="password" name="newPass2" required>
+</pre>
+<input type="submit" value="Update" name="updatePassButton"></input>
+</form>
+';
+	echo $form;
+	if(isset($_POST['updatePassButton'])){
+		if($_POST['newPass1'] != $_POST['newPass2']){
+			echo "New passwords don't match.";
+			exit();
+		}
+		$oldPass=$_POST['oldPass'];
+		$newPass=$_POST['newPass1'];
+		$id=$_SESSION['id'];
+		if(updatePass($oldPass, $newPass, $id)){
+			echo "Password updated";
+		}else{
+			echo "Current password incorrect(or we encountered an error).";
+		}
+	}
 }else{
 	$form='
 <form name="login" action="" method="post">
@@ -186,6 +235,7 @@ Password: <input type="password" name="password" id="password" required>
 	if($_SESSION['loggedIn']){
 		$username=$_SESSION['userName'];
 		echo "You're already logged in, $username<br>";
+		echo "<a href='?action=dashboard'> Dashboard</a><br>";
 		echo "<a href='?action=logout'> Log out </a>";
 		echo "</body></html>";
 		exit;
@@ -203,10 +253,12 @@ Password: <input type="password" name="password" id="password" required>
 	$creds=checkCreds($email, $password);
 	$passwordHash=$creds['password'];
 	$username=$creds['username'];
+	$id=$creds['rowid'];
 	if(password_verify($password, $passwordHash)){
 	     echo "Congrats! Your user name is: $username";
 	     $_SESSION['loggedIn']=true;
 		$_SESSION['userName']=$username;
+		$_SESSION['id']=$id;
 	}else{
 	     echo "Drat! Wrong password or email.";
 	}

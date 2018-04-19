@@ -83,8 +83,36 @@ function checkPending($email){
      closeDB($db);
      return $status;
 }
+function checkPending2($username){
+     $query="SELECT * FROM pending WHERE username=\"$username\"";
+     $db=openDB();
+     $result=$db->query($query);
+     $result=$result->fetchArray();
+     $status=TRUE;
+     if(empty($result)){
+          $status=FALSE;
+     }else{
+          $status=TRUE;
+     }
+     closeDB($db);
+     return $status;
+}
 function checkUsers($email){
      $query="SELECT * FROM users WHERE email=\"$email\"";
+     $db=openDB();
+     $result=$db->query($query);
+     $result=$result->fetchArray();
+     $status=TRUE;
+     if(empty($result)){
+          $status=FALSE;
+     }else{
+          $status=TRUE;
+     }
+     closeDB($db);
+     return $status;
+}
+function checkUsers2($username){
+     $query="SELECT * FROM users WHERE username=\"$username\"";
      $db=openDB();
      $result=$db->query($query);
      $result=$result->fetchArray();
@@ -117,6 +145,14 @@ function updatePass($oldPass, $newPass, $id){
 	}else{
 		$status=false;
 	}
+	closeDB($db);
+	return $status;
+}
+function updateUsername($newUsername, $id){
+	$query="UPDATE users SET username='$newUsername' WHERE rowid=$id";
+	$db=openDB();
+	$status=$db->exec($query);
+	closeDB($db);
 	return $status;
 }
 //Get action
@@ -151,8 +187,11 @@ Verify:   <input type="password" name="verify" id="password" required>
 	//Insert into pending
 	//Unless the user already exists
 	if(checkPending($email) || checkUsers($email)){
-	     echo "<br> <h3> Sorry, the user already exists </h3>";
+	     echo "<br> <h3> Sorry, the email is already in use</h3>";
 	     exit();
+	}
+	if(checkPending2($username) || checkUsers2($username)){
+		echo "<br> <h3> Sorry, the username is already in use</h3>";
 	}
 	$passwordHash=password_hash("$password", PASSWORD_DEFAULT);
 	$randcode=addPending($username, $email, $passwordHash);
@@ -163,7 +202,7 @@ Verify:   <input type="password" name="verify" id="password" required>
 	     $message="<html><body><span style=\"$styles\"><h1>Welcome to $domain!</h1><p>Your account is almost set-up, but there is one last step you need to complete! Simply $verify_link <p> Link not working? No prboblem, just copy and paste: $url<br><p>Sincerely,<br>The people over at $domain</span></body></html>";
 	     $headers="From: $from_email\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n";
 	     mail("$email", "Verify your email($domain)", $message, $headers);
-	     echo "An email has been sent to $email";
+	     echo "<br> An email has been sent to $email";
 	}else{
 		echo "<br> <h3> Sorry, an error occured, please try again later </h3>";
 	}
@@ -195,8 +234,14 @@ Verify:   <input type="password" name="verify" id="password" required>
 	$id=$_SESSION['id'];
 	echo "Your username: $username<br>";
 	echo "Your ID: $id<br>";
-	echo "<a href='?action=logout'> Log out </a>";
-	echo "<br>Change your password: <br>";
+	echo "<a href='?action=logout'> Log out </a><br>";
+	echo "<a onclick='showUpdatePass()' href='#'> Update Password</a>";
+	echo "<script>
+function showUpdatePass(){
+	document.getElementById('showUpdatePassForm').style.display = 'unset';
+}
+</script>";
+	echo "<br><span style='display: none;' id='showUpdatePassForm'><br>";
 	$form='
 <form action="" method="post" name="updatePass">
 <pre>
@@ -206,6 +251,7 @@ Verify:  <input type="password" name="newPass2" required>
 </pre>
 <input type="submit" value="Update" name="updatePassButton"></input>
 </form>
+</span>
 ';
 	echo $form;
 	if(isset($_POST['updatePassButton'])){
@@ -220,6 +266,30 @@ Verify:  <input type="password" name="newPass2" required>
 			echo "Password updated";
 		}else{
 			echo "Current password incorrect(or we encountered an error).";
+		}
+	}
+	echo "<a onclick='showUpdateUsername()' href='#'> Update Username</a>";
+     echo "<script>
+function showUpdateUsername(){
+     document.getElementById('showUpdateUsername').style.display = 'unset';
+}
+</script>";
+     echo "<br><span style='display: none;' id='showUpdateUsername'><br>";
+	$form='
+<form action="" method="post" name="updateUsername">
+<pre>
+New username: <input type="text" name="newUsername" required> </input>
+</pre>
+<input type="submit" value="Update" name="newUsernameButton"></input>
+</form>
+</span>
+';
+	echo $form;
+	if(isset($_POST['newUsernameButton'])){
+		if(updateUsername($_POST['newUsername'], $_SESSION['id'])){
+			echo "Username updated.";
+		}else{
+			echo "Username in use.";
 		}
 	}
 }else{

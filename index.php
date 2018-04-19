@@ -1,5 +1,25 @@
 <?php
 session_start();
+/*
+    SQLite Web Login- A single file to manage user accounts with a SQLite DB for easy set up and minimal maintainance
+    Copyright (C) 2018  NerdOfLinux
+
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation; either version 2 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+    You can also find the full copy of the license at https://goo.gl/Pkfs1S
+*/
 //Set info
 //Fill out the following:
 $domain="example.com";
@@ -61,6 +81,7 @@ function addPending($userName, $email, $password){
      closeDB($db);
      return urlencode($randcode);
 }
+//Delete a user from the pending table
 function removePending($code){
      $query="DELETE FROM pending WHERE code=\"$code\"";
      $db=openDB();
@@ -83,6 +104,7 @@ function checkPending($email){
      closeDB($db);
      return $status;
 }
+//Check pending table for username
 function checkPending2($username){
      $query="SELECT * FROM pending WHERE username=\"$username\"";
      $db=openDB();
@@ -97,6 +119,7 @@ function checkPending2($username){
      closeDB($db);
      return $status;
 }
+//Check users table for email
 function checkUsers($email){
      $query="SELECT * FROM users WHERE email=\"$email\"";
      $db=openDB();
@@ -111,6 +134,7 @@ function checkUsers($email){
      closeDB($db);
      return $status;
 }
+//Check users table for username
 function checkUsers2($username){
      $query="SELECT * FROM users WHERE username=\"$username\"";
      $db=openDB();
@@ -133,6 +157,7 @@ function checkCode($code){
      $result=$result->fetchArray();
      return $result;
 }
+//Update the password
 function updatePass($oldPass, $newPass, $id){
 	$query1="SELECT password FROM users WHERE rowid=$id";
 	$db=openDB();
@@ -148,6 +173,7 @@ function updatePass($oldPass, $newPass, $id){
 	closeDB($db);
 	return $status;
 }
+//Update the username
 function updateUsername($newUsername, $id){
 	$query="UPDATE users SET username='$newUsername' WHERE rowid=$id";
 	$db=openDB();
@@ -157,6 +183,7 @@ function updateUsername($newUsername, $id){
 }
 //Get action
 $action=$_GET['action'];
+//If the GET parameter is signup, display the signup form
 if($action=="signup"){
 	$form='
 <form name="signup" action="" method="post">
@@ -222,10 +249,12 @@ Verify:   <input type="password" name="verify" id="password" required>
 	}else{
 	     echo "<br> <h3> Sorry, there was an error creating the account. Please try again later.";
 	}
+//Else if the action is to logout
 }else if($action=="logout"){
 	unset($_SESSION['loggedIn']);
 	unset($_SESSION['userName']);
 	echo "You're now logged out!";
+//If the request is for the dashboard
 }else if($action=="dashboard"){
 	if(!$_SESSION['loggedIn']){
 		exit();
@@ -235,6 +264,7 @@ Verify:   <input type="password" name="verify" id="password" required>
 	echo "Your username: $username<br>";
 	echo "Your ID: $id<br>";
 	echo "<a href='?action=logout'> Log out </a><br>";
+	//Use some JS to only display the form when a link is clicked
 	echo "<a onclick='showUpdatePass()' href='#'> Update Password</a>";
 	echo "<script>
 function showUpdatePass(){
@@ -254,6 +284,7 @@ Verify:  <input type="password" name="newPass2" required>
 </span>
 ';
 	echo $form;
+	//Only do stuff if the button is pressed
 	if(isset($_POST['updatePassButton'])){
 		if($_POST['newPass1'] != $_POST['newPass2']){
 			echo "New passwords don't match.";
@@ -268,6 +299,7 @@ Verify:  <input type="password" name="newPass2" required>
 			echo "Current password incorrect(or we encountered an error).";
 		}
 	}
+	//Again, JS to only display form upon link press
 	echo "<a onclick='showUpdateUsername()' href='#'> Update Username</a>";
      echo "<script>
 function showUpdateUsername(){
@@ -292,6 +324,7 @@ New username: <input type="text" name="newUsername" required> </input>
 			echo "Username in use.";
 		}
 	}
+//If an unknown or no parameter is given, assume login
 }else{
 	$form='
 <form name="login" action="" method="post">

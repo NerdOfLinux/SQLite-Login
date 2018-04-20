@@ -254,9 +254,11 @@ Verify:   <input type="password" name="verify" id="password" required>
 	unset($_SESSION['loggedIn']);
 	unset($_SESSION['userName']);
 	echo "You're now logged out!";
+	header("Location: ?action=login");
 //If the request is for the dashboard
 }else if($action=="dashboard"){
 	if(!$_SESSION['loggedIn']){
+		header("Location: ?action=login");
 		exit();
 	}
 	$username=$_SESSION['userName'];
@@ -362,6 +364,7 @@ Password: <input type="password" name="password" id="password" required>
 	     $_SESSION['loggedIn']=true;
 		$_SESSION['userName']=$username;
 		$_SESSION['id']=$id;
+		header("Location: ?action=dashboard");
 	}else{
 	     echo "Drat! Wrong password or email.";
 	}

@@ -3,7 +3,7 @@
 ## Setup:
 Run in terminal:
 ```bash
-wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Login/master/index.php -O account.php
+wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Web-Login/master/index.php -O account.php
 sqlite3 .ht.users.db
 ```
 In SQLite:

@@ -1,5 +1,9 @@
 <?php
 session_start();
+$close="
+</body>
+</html>
+";
 /*
     SQLite Web Login- A single file to manage user accounts with a SQLite DB for easy set up and minimal maintainance
     Copyright (C) 2018  NerdOfLinux
@@ -26,9 +30,48 @@ $domain="example.com";
 $from_email="no-reply@$domain";
 $DB_location=".ht.users.db";
 ?>
+<!DOCTYPE html>
 <html>
 <head>
 	<title> <?php echo "$domain"; ?> </title>
+	<style>
+		a{
+			color: blue;
+		}
+		button[type=submit],input[type=submit]{
+			width: 200px;
+			height: 25px;
+			padding: 3px;
+			margin: 5px;
+			background-color: lightsteelblue;
+			border-radius: 5px;
+		}
+		button[type=submit]:hover,input[type=submit]:hover{
+			border-style: inset;
+		}
+		button[type=submit]:focus,input[type=submit]:focus{
+			background-color: lightgray;
+		}
+		input{
+			height: 25px;
+			padding: 3px;
+			margin: 3px;
+			border-radius: 3px;
+		}
+		#hideOnClickUsername,#hideOnClickPassword{
+			padding: 3px;
+			margin: 3px;
+			height: 25px;
+			width: 200px;
+			border-radius: 5px;
+		}
+		#hideOnClickUsername:hover,#hideOnClickPassword:hover{
+			background-color: lightgray;
+		}
+		.center{
+			text-align: center;
+		}
+	</style>
 </head>
 <body>
 <?php
@@ -185,7 +228,9 @@ function updateUsername($newUsername, $id){
 $action=$_GET['action'];
 //If the GET parameter is signup, display the signup form
 if($action=="signup"){
-	$form='
+?>
+<h2 class="center"> <?php echo $domain;?> signup</h2>
+<hr>
 <form name="signup" action="" method="post">
 <pre>
 Username: <input type="text" name="username" id="username" placeholder="unicorns101" required>
@@ -195,11 +240,11 @@ Verify:   <input type="password" name="verify" id="password" required>
 <button type="submit" name="signupButton"> Sign Up </button>
 </pre>
 </form>
-';
-	echo $form;
-	echo "<a href='?action=login'> Log in </a><br>";
+<a href='?action=login'> Log in </a><br>
+<?php
 	//Only do stuff if the sign up button is pressed
 	if(!isset($_POST['signupButton'])){
+		echo $close;
 	     exit();
 	}
 	//Set variables
@@ -215,6 +260,7 @@ Verify:   <input type="password" name="verify" id="password" required>
 	//Unless the user already exists
 	if(checkPending($email) || checkUsers($email)){
 	     echo "<br> <h3> Sorry, the email is already in use</h3>";
+		echo $close;
 	     exit();
 	}
 	if(checkPending2($username) || checkUsers2($username)){
@@ -238,6 +284,7 @@ Verify:   <input type="password" name="verify" id="password" required>
 	$check=checkCode($code);
 	if(empty($check)){
 	     echo "<br> <h3> Sorry, that code does not appear to exist</h3>";
+		echo $close;
 	     exit();
 	}
 	$username=$check['username'];
@@ -263,18 +310,23 @@ Verify:   <input type="password" name="verify" id="password" required>
 	}
 	$username=$_SESSION['userName'];
 	$id=$_SESSION['id'];
-	echo "Your username: $username<br>";
-	echo "Your ID: $id<br>";
-	echo "<a href='?action=logout'> Log out </a><br>";
-	//Use some JS to only display the form when a link is clicked
-	echo "<a onclick='showUpdatePass()' href='#'> Update Password</a>";
-	echo "<script>
+?>
+<h2 class="center"> <?php echo $domain;?> user dashboard </h2>
+<hr>
+Your username: <?php echo $username;?><br>
+Your ID: <?php echo $id?><br>
+<a href='?action=logout'> Log out </a><br>
+Available Options:<br>
+<!--Use some JS to only display the form when a link is clicked-->
+<button onclick='showUpdatePass()' href='#' id="hideOnClickPassword"> Update Password</button><br>
+<script>
 function showUpdatePass(){
 	document.getElementById('showUpdatePassForm').style.display = 'unset';
+	document.getElementById('hideOnClickPassword').style.display = 'none';
 }
-</script>";
-	echo "<br><span style='display: none;' id='showUpdatePassForm'><br>";
-	$form='
+</script>
+<span style='display: none;' id='showUpdatePassForm'>
+<h3> Password Update: </h3>
 <form action="" method="post" name="updatePass">
 <pre>
 Current: <input type="password" name="oldPass" required>
@@ -284,32 +336,34 @@ Verify:  <input type="password" name="newPass2" required>
 <input type="submit" value="Update" name="updatePassButton"></input>
 </form>
 </span>
-';
-	echo $form;
+<?php
 	//Only do stuff if the button is pressed
 	if(isset($_POST['updatePassButton'])){
 		if($_POST['newPass1'] != $_POST['newPass2']){
 			echo "New passwords don't match.";
+			echo $close;
 			exit();
 		}
 		$oldPass=$_POST['oldPass'];
 		$newPass=$_POST['newPass1'];
 		$id=$_SESSION['id'];
 		if(updatePass($oldPass, $newPass, $id)){
-			echo "Password updated";
+			echo "Password updated!<br>";
 		}else{
-			echo "Current password incorrect(or we encountered an error).";
+			echo "Current password incorrect(or we encountered an error).<br>";
 		}
 	}
-	//Again, JS to only display form upon link press
-	echo "<a onclick='showUpdateUsername()' href='#'> Update Username</a>";
-     echo "<script>
+?>
+<!--Again, JS to only display form upon link press-->
+<button onclick='showUpdateUsername()' href='#' id="hideOnClickUsername"> Update Username</button>
+<script>
 function showUpdateUsername(){
      document.getElementById('showUpdateUsername').style.display = 'unset';
+	document.getElementById('hideOnClickUsername').style.display = 'none';
 }
-</script>";
-     echo "<br><span style='display: none;' id='showUpdateUsername'><br>";
-	$form='
+</script>
+<br><span style='display: none;' id='showUpdateUsername'><br>
+<h3> Username Update: </h3>
 <form action="" method="post" name="updateUsername">
 <pre>
 New username: <input type="text" name="newUsername" required> </input>
@@ -317,18 +371,19 @@ New username: <input type="text" name="newUsername" required> </input>
 <input type="submit" value="Update" name="newUsernameButton"></input>
 </form>
 </span>
-';
-	echo $form;
+<?php
 	if(isset($_POST['newUsernameButton'])){
 		if(updateUsername($_POST['newUsername'], $_SESSION['id'])){
-			echo "Username updated.";
+			echo "Username updated!<br>";
 		}else{
-			echo "Username in use.";
+			echo "Username in use!<br>";
 		}
 	}
 //If an unknown or no parameter is given, assume login
 }else{
-	$form='
+?>
+<h2 class="center"> <?php echo $domain;?> login</h2>
+<hr>
 <form name="login" action="" method="post">
 <pre>
 Email:    <input type="email" name="email" id="email" placeholder="bob@example.com" required>
@@ -336,7 +391,7 @@ Password: <input type="password" name="password" id="password" required>
 <button type="submit" name="loginButton"> Log In</button>
 </pre>
 </form>
-';
+<?php
 	if($_SESSION['loggedIn']){
 		$username=$_SESSION['userName'];
 		echo "You're already logged in, $username<br>";
@@ -350,6 +405,7 @@ Password: <input type="password" name="password" id="password" required>
 	//Only do stuff if the sign up button is pressed
 	if(!isset($_POST['loginButton'])){
 	     exit();
+		echo $close;
 	}
 	//Set variables
 	$email=$_POST['email'];

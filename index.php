@@ -26,9 +26,19 @@ $close="
 */
 //Set info
 //Fill out the following:
-$domain="example.com";
-$from_email="no-reply@$domain";
-$DB_location=".ht.users.db";
+//Only used if they are not set(so you can include this in another file with the settings there)
+if(!isset($domain)){
+	$domain="example.com";
+}
+if(!isset($from_email)){
+	$from_email="no-reply@$domain";
+}
+if(!isset($DB_location)){
+	$DB_location=".ht.users.db";
+}
+if(!isset($accountFile)){
+	$accountFile="index.php";
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -269,7 +279,7 @@ Verify:   <input type="password" name="verify" id="password" required>
 	$passwordHash=password_hash("$password", PASSWORD_DEFAULT);
 	$randcode=addPending($username, $email, $passwordHash);
 	if(isset($randcode)){
-	          $url="http://$domain/?action=verify&code=$randcode";
+	     $url="http://$domain/$accountFile?action=verify&code=$randcode";
 	     $verify_link="<a href=\"$url\"> verify your email.</a>";
 	     $styles="font-family: Arial;font-size: 14px;";
 	     $message="<html><body><span style=\"$styles\"><h1>Welcome to $domain!</h1><p>Your account is almost set-up, but there is one last step you need to complete! Simply $verify_link <p> Link not working? No prboblem, just copy and paste: $url<br><p>Sincerely,<br>The people over at $domain</span></body></html>";
@@ -381,6 +391,17 @@ New username: <input type="text" name="newUsername" required> </input>
 	}
 //If an unknown or no parameter is given, assume login
 }else{
+     if($_SESSION['loggedIn']){
+          $username=$_SESSION['userName'];
+?>
+You're already logged in, <?php echo $username; ?><br>
+You can:<br>
+Go to your user <a href='?action=dashboard'> dashboard.</a><br>
+Or, you can <a href='?action=logout'> log out. </a>
+<?php
+          echo $close;
+          exit();
+     }
 ?>
 <h2 class="center"> <?php echo $domain;?> login</h2>
 <hr>
@@ -391,17 +412,8 @@ Password: <input type="password" name="password" id="password" required>
 <button type="submit" name="loginButton"> Log In</button>
 </pre>
 </form>
+<a href='?action=signup'> Create an account </a><br>
 <?php
-	if($_SESSION['loggedIn']){
-		$username=$_SESSION['userName'];
-		echo "You're already logged in, $username<br>";
-		echo "<a href='?action=dashboard'> Dashboard</a><br>";
-		echo "<a href='?action=logout'> Log out </a>";
-		echo "</body></html>";
-		exit;
-	}
-	echo $form;
-	echo "<a href='?action=signup'> Create an account </a><br>";
 	//Only do stuff if the sign up button is pressed
 	if(!isset($_POST['loginButton'])){
 	     exit();

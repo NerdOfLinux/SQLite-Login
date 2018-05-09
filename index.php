@@ -45,6 +45,8 @@ if(!isset($accountFile)){
 <head>
 	<title> <?php echo "$domain"; ?> </title>
 	<style>
+	<?php
+	echo preg_replace("*\s*", "","
 		a{
 			color: blue;
 		}
@@ -80,8 +82,9 @@ if(!isset($accountFile)){
 		}
 		.center{
 			text-align: center;
-		}
+		}");?>
 	</style>
+	<meta name="viewport" content="initial-scale=1.0">
 </head>
 <body>
 <?php

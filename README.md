@@ -10,6 +10,7 @@ In SQLite:
 ```sql
 CREATE TABLE pending (code TEXT UNIQUE NOT NULL,username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
 CREATE TABLE users (username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
+CREATE TABLE newEmail (code TEXT UNIQUE NOT NULL, newEmail TEXT UNIQUE NOT NULL, id TEXT UNIQUE NOT NULL);
 ```
 ## Notes:
 I build this using things such as:
@@ -23,9 +24,10 @@ However, this is designed to be **just** a login system. For any other functiona
 
 ## Sessions varialbes set:
 Upon successful login, the following variables are set:
-* loggedIn is set to true
-* userName is set to the username
-* id is set to the rowid in sqlite, which is mainly used when updating user info
+* `loggedIn` is set to true
+* `userName` is set to the username
+* `id` is set to the rowid in sqlite, which is mainly used when updating user info
+* `email` is set to the user's email
 
 ## SQLite is powerful enough for this
 Many people will likely think that SQLite is too weak for use in a production website, well, it's not. According to the [SQLite appropriate uses](https://www.sqlite.org/whentouse.html):

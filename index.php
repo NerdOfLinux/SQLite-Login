@@ -120,15 +120,21 @@ function checkCreds($email){
      closeDB($db);
      return $result;
 }
+//Generate a random code
+function randCode(){
+	//Generate a random code
+     $x="";
+     for($i=0;$i<5;$i++){
+              $a=mt_rand(999,999999999);
+                 $x .= $a;
+     }
+     $randcode=base64_encode($x);
+	return $randcode;
+}
 //Allow for email links
 function addPending($userName, $email, $password){
      //Generate a random code
-     $x="";
-     for($i=0;$i<5;$i++){
-	         $a=mt_rand(999,999999999);
-	            $x .= $a;
-     }
-     $randcode=base64_encode($x);
+     $randcode=randCode();
      $query="INSERT INTO pending (code, username, email, password) VALUES(\"$randcode\", \"$userName\", \"$email\", \"$password\")";
      $db=openDB();
      if(!$db->exec($query)){
@@ -148,6 +154,20 @@ function removePending($code){
 //Check if user or pending exists
 function checkPending($email){
      $query="SELECT * FROM pending WHERE email=\"$email\"";
+     $db=openDB();
+     $result=$db->query($query);
+     $result=$result->fetchArray();
+     $status=TRUE;
+     if(empty($result)){
+          $status=FALSE;
+     }else{
+          $status=TRUE;
+     }
+     closeDB($db);
+     return $status;
+}
+function checkEmailPending($email){
+     $query="SELECT * FROM newEmail WHERE newEmail=\"$email\"";
      $db=openDB();
      $result=$db->query($query);
      $result=$result->fetchArray();
@@ -237,6 +257,33 @@ function updateUsername($newUsername, $id){
 	closeDB($db);
 	return $status;
 }
+//Update the email
+function insertNewEmail($randcode, $newEmail, $id){
+	$query="INSERT INTO newEmail (code, newEmail, id) VALUES(\"$randcode\", \"$newEmail\", \"$id\")";
+	$db=openDB();
+	$status=$db->exec($query);
+	return $status;
+}
+function checkEmailCode($code){
+	$query="SELECT * FROM newEmail WHERE code = \"$code\"";
+	$db=openDB();
+     $result=$db->query($query);
+     $result=$result->fetchArray();
+	closeDB($db);
+     return $result;
+}
+function updateEmail($code){
+     $query="SELECT * FROM newEmail WHERE code = \"$code\"";
+     $db=openDB();
+     $result=$db->query($query);
+     $result=$result->fetchArray();
+	$email=$result['newEmail'];
+	$id=$result['id'];
+	$query="UPDATE users SET email=\"$email\" WHERE rowid=\"$id\";DELETE FROM newEmail WHERE code=\"$code\"";
+	$status=$db->exec($query);
+	closeDB($db);
+     return $status;
+}
 //Get action
 $action=$_GET['action'];
 //If the GET parameter is signup, display the signup form
@@ -309,6 +356,19 @@ Verify:   <input type="password" name="verify" id="password" required>
 	}else{
 	     echo "<br> <h3> Sorry, there was an error creating the account. Please try again later.";
 	}
+}else if($action=="updateEmail"){
+	$code=urldecode($_GET['code']);
+	$check=checkEmailCode($code);
+	if(empty($check)){
+		echo "<br> <h3> Sorry, that code does not appear to exist</h3>";
+		echo $close;
+		exit();
+	}
+	if(updateEmail($code)){
+		echo "Email updated.";
+	}else{
+		echo "Please refresh this page to try again.";
+	}
 //Else if the action is to logout
 }else if($action=="logout"){
 	unset($_SESSION['loggedIn']);
@@ -323,9 +383,11 @@ Verify:   <input type="password" name="verify" id="password" required>
 	}
 	$username=$_SESSION['userName'];
 	$id=$_SESSION['id'];
+	$email=$_SESSION['email'];
 ?>
 <h2 class="center"> <?php echo $domain;?> user dashboard </h2>
 <hr>
+Your email: <?php echo $email; ?><br>
 Your username: <?php echo $username;?><br>
 Your ID: <?php echo $id?><br>
 <a href='?action=logout'> Log out </a><br>
@@ -392,6 +454,48 @@ New username: <input type="text" name="newUsername" required> </input>
 			echo "Username in use!<br>";
 		}
 	}
+?>
+<!--Again, JS to only display form upon link press-->
+<button onclick='showUpdateEmail()' href='#' id="hideOnClickUsername"> Update Email </button>
+<script>
+function showUpdateEmail(){
+     document.getElementById('showUpdateEmail').style.display = 'unset';
+     document.getElementById('hideOnClickEmail').style.display = 'none';
+}
+</script>
+<br><span style='display: none;' id='showUpdateEmail'><br>
+<h3> Email Update: </h3>
+<form action="" method="post" name="updateUsername">
+<pre>
+New email: <input type="email" name="newEmail" required> </input>
+</pre>
+<input type="submit" value="Update" name="newEmailButton"></input>
+</form>
+</span>
+<?php
+     if(isset($_POST['newEmailButton'])){
+		$email=$_POST['newEmail'];
+		if(checkPending($email) || checkUsers($email)){
+          	echo "<br> <h3> Sorry, that email is already in use</h3>";
+          	echo $close;
+          	exit();
+     	}
+		//Doesn't work for some reason if placed above
+		if(checkEmailPending($email)){
+			echo "<br> <h3> Sorry, that email is already pending</h3>";
+               echo $close;
+               exit();
+		}
+		$randcode=randCode();
+		$url="http://$domain/$accountFile?action=updateEmail&code=$randcode";
+		$verify_link="<a href=\"$url\"> verify your email.</a>";
+		$styles="font-family: Arial;font-size: 14px;";
+		$message="<html><body><span style=\"$styles\"><h1>Welcome to $domain!</h1><p>You have recently requested an email change. In order to do this, simply $verify_link <p> Link not working? No prboblem, just copy and paste: $url<br><p>Sincerely,<br>The people over at $domain<br><br><p> Didn't request an email change? You can safely ignore this email, although changing your password is recommended.</span></body></html>";
+		$headers="From: $from_email\r\nMIME-Version: 1.0\r\nContent-Type: text/html; charset=UTF-8\r\n";
+		mail("$email", "Verify your email($domain)", $message, $headers);
+		insertNewEmail($randcode, $email, $_SESSION['id']);
+		echo "Email verification sent.";
+     }
 //If an unknown or no parameter is given, assume login
 }else{
      if($_SESSION['loggedIn']){
@@ -435,6 +539,7 @@ Password: <input type="password" name="password" id="password" required>
 	     $_SESSION['loggedIn']=true;
 		$_SESSION['userName']=$username;
 		$_SESSION['id']=$id;
+		$_SESSION['email']=$email;
 		header("Location: ?action=dashboard");
 	}else{
 	     echo "Drat! Wrong password or email.";

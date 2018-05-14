@@ -25,7 +25,7 @@ $close="
     You can also find the full copy of the license at https://goo.gl/Pkfs1S
 */
 //Set info
-//Fill out the following:
+//Please use a wrapper script :-)
 //Only used if they are not set(so you can include this in another file with the settings there)
 if(!isset($domain)){
 	$domain="example.com";
@@ -39,14 +39,38 @@ if(!isset($DB_location)){
 if(!isset($accountFile)){
 	$accountFile="index.php";
 }
+if(!isset($siteName)){
+	$siteName=$domain;
+}
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<title> <?php echo "$domain"; ?> </title>
+	<title>
+	<?php
+	//Use title + action as the title
+	$action=$_GET['action'];
+	if($action == "verify"){
+		$action="Verification";
+	}else if($action == "updateEmail"){
+		$action="Verification";
+	}else{
+		$action=ucfirst($action);
+	}
+	if(isset($customTitle)){
+		echo "$customTitle $action";
+	}else{
+		echo "$siteName $action";
+	}
+
+	?> </title>
 	<style>
 	<?php
-	echo preg_replace("*\s*", "","
+	//Inline external CSS to prevent caching(after removing all spaces)
+	if(isset($customCSS) && is_file($customCSS)){
+		echo preg_replace("*\s*", "", file_get_contents($customCSS));
+	}else{
+		echo preg_replace("*\s*", "","
 		a{
 			color: blue;
 		}
@@ -82,9 +106,17 @@ if(!isset($accountFile)){
 		}
 		.center{
 			text-align: center;
-		}");?>
+		}");
+		}?>
 	</style>
 	<meta name="viewport" content="initial-scale=1.0">
+	<?php
+	if(isset($customLogo)){
+	?>
+	<link rel="shortcut icon" href="<?php echo $customLogo;?>">
+	<?php
+	}
+	?>
 </head>
 <body>
 <?php
@@ -289,7 +321,7 @@ $action=$_GET['action'];
 //If the GET parameter is signup, display the signup form
 if($action=="signup"){
 ?>
-<h2 class="center"> <?php echo $domain;?> signup</h2>
+<h2 class="center"> <?php echo $siteName;?> signup</h2>
 <hr>
 <form name="signup" action="" method="post">
 <pre>
@@ -505,7 +537,7 @@ New email: <input type="email" name="newEmail" required> </input>
           exit();
      }
 ?>
-<h2 class="center"> <?php echo $domain;?> login</h2>
+<h2 class="center"> <?php echo $siteName;?> login</h2>
 <hr>
 <form name="login" action="" method="post">
 <pre>

@@ -8,11 +8,11 @@ The following features *currently* work:
 * Passwords updates
 * Username updates
 * Email updates
+* Custom CSS
+* Custom icon
 
 The following features are *likely* going to be added soon:
 * Password resets
-* Option to set a logo
-* Custom CSS(can be achieved now by using a [wrapper](#Wrapper))
 
 ## Setup:
 Run in terminal:
@@ -42,6 +42,17 @@ Now, whenever there is an update, simply run the following again:
 wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Web-Login/master/index.php -O .ht.accountBackend.php
 ```
 and all settings will **NOT** be affected as long as the wrapper script is not overwritten.
+
+### Wrapper options
+The following variables can be set:
+* `domain` - this should be set to your site's full domain name
+* `accountFile` - this should be set to the wrapper script's name(i.e. `account.php`)
+* `from_email` - the address that emails are sent from(usually no-reply@your-domain)
+* `siteName` - your site's name(appears in the headers)
+* `customTitle` - your site's (shorter) name(appears in the tab title)
+* `customCSS` - location to CSS file(must be accessible by PHP script)
+* `customLogo` - location to a custom logo(not checked, be sure the filename is correct)
+
 ## Notes:
 
 I build this using things such as:

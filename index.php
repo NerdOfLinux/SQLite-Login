@@ -70,14 +70,14 @@ if(!isset($accountFile)){
 			margin: 3px;
 			border-radius: 3px;
 		}
-		#hideOnClickUsername,#hideOnClickPassword{
+		#hideOnClickUsername,#hideOnClickPassword,#hideOnClickEmail{
 			padding: 3px;
 			margin: 3px;
 			height: 25px;
 			width: 200px;
 			border-radius: 5px;
 		}
-		#hideOnClickUsername:hover,#hideOnClickPassword:hover{
+		#hideOnClickUsername:hover,#hideOnClickPassword:hover,#hideOnClickEmail:hover{
 			background-color: lightgray;
 		}
 		.center{
@@ -385,7 +385,7 @@ Verify:   <input type="password" name="verify" id="password" required>
 	$id=$_SESSION['id'];
 	$email=$_SESSION['email'];
 ?>
-<h2 class="center"> <?php echo $domain;?> user dashboard </h2>
+<h2 class="center"> <?php echo $username;?>'s Dashboard </h2>
 <hr>
 Your email: <?php echo $email; ?><br>
 Your username: <?php echo $username;?><br>
@@ -456,7 +456,7 @@ New username: <input type="text" name="newUsername" required> </input>
 	}
 ?>
 <!--Again, JS to only display form upon link press-->
-<button onclick='showUpdateEmail()' href='#' id="hideOnClickUsername"> Update Email </button>
+<button onclick='showUpdateEmail()' href='#' id="hideOnClickEmail"> Update Email </button>
 <script>
 function showUpdateEmail(){
      document.getElementById('showUpdateEmail').style.display = 'unset';
@@ -500,12 +500,7 @@ New email: <input type="email" name="newEmail" required> </input>
 }else{
      if($_SESSION['loggedIn']){
           $username=$_SESSION['userName'];
-?>
-You're already logged in, <?php echo $username; ?><br>
-You can:<br>
-Go to your user <a href='?action=dashboard'> dashboard.</a><br>
-Or, you can <a href='?action=logout'> log out. </a>
-<?php
+		header("Location: ?action=dashboard");
           echo $close;
           exit();
      }

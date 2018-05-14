@@ -1,9 +1,23 @@
 # A simple login system using SQLite
 
+## Features
+The following features *currently* work:
+* Sign-ups
+* Log-ins
+* Session variables are set([session variables set](#sessions-varialbes-set))
+* Passwords updates
+* Username updates
+* Email updates
+
+The following features are *likely* going to be added soon:
+* Password resets
+* Option to set a logo
+* Custom CSS(can be achieved now by using a [wrapper](#Wrapper))
+
 ## Setup:
 Run in terminal:
 ```bash
-wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Web-Login/master/index.php -O account.php
+wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Web-Login/master/index.php -O .ht.accountBackend.php
 sqlite3 .ht.users.db
 ```
 In SQLite:
@@ -12,7 +26,24 @@ CREATE TABLE pending (code TEXT UNIQUE NOT NULL,username TEXT UNIQUE NOT NULL, e
 CREATE TABLE users (username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
 CREATE TABLE newEmail (code TEXT UNIQUE NOT NULL, newEmail TEXT UNIQUE NOT NULL, id TEXT UNIQUE NOT NULL);
 ```
+
+## Wrapper
+Having everything in one file is great in terms of ease of use. However, this does mean that updates will overwrite your changes. To get around this, more recent versions can accept existing variables. So, assuming you used the `wget` command above, a wrapper script(`account.php`) would look something like:
+```php
+<?php
+$domain="your_domain_here";
+$from_email="no-reply@your-domain-here";
+$accountFile="account.php";
+require(".ht.accountBackend.php");
+?>
+```
+Now, whenever there is an update, simply run the following again:
+```shell
+wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Web-Login/master/index.php -O .ht.accountBackend.php
+```
+and all settings will **NOT** be affected as long as the wrapper script is not overwritten.
 ## Notes:
+
 I build this using things such as:
 
 ```sql
@@ -45,5 +76,5 @@ Also, according to the [FAQs](https://www.sqlite.org/faq.html#q19):
 Which means SQLite can handle hundreds to thousands of new users per second, which is very unlikely to get even on a popular website.
 
 # This is NOT yet ready to be used on a real site
-This is in pre-alpha stages, and will likely break a lot.
+This is in alpha stages, and will likely have a ton of issues.
 

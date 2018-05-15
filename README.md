@@ -20,12 +20,11 @@ Run in terminal:
 wget https://raw.githubusercontent.com/NerdOfLinux/SQLite-Web-Login/master/index.php -O .ht.accountBackend.php
 sqlite3 .ht.users.db
 ```
-In SQLite:
-```sql
-CREATE TABLE pending (code TEXT UNIQUE NOT NULL,username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
-CREATE TABLE users (username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);
-CREATE TABLE newEmail (code TEXT UNIQUE NOT NULL, newEmail TEXT UNIQUE NOT NULL, id TEXT UNIQUE NOT NULL);
+Then, run(with the `php` command or by visiting) the PHP file, and you should see:
 ```
+Database file created
+```
+refresh, and the install should be complete!
 
 ## Wrapper
 Having everything in one file is great in terms of ease of use. However, this does mean that updates will overwrite your changes. To get around this, more recent versions can accept existing variables. So, assuming you used the `wget` command above, a wrapper script(`account.php`) would look something like:

@@ -124,6 +124,18 @@ if(!isset($siteName)){
 //Create functions to user
 //Define db location
 $location=$DB_location;
+//Semi-installer functionality
+//If the DB file does not exist, then create it:
+if(!is_file($location)){
+	$db=openDB();
+	$query="BEGIN;CREATE TABLE pending (code TEXT UNIQUE NOT NULL,username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);CREATE TABLE users (username TEXT UNIQUE NOT NULL, email TEXT UNIQUE NOT NULL, password TEXT NOT NULL);CREATE TABLE newEmail (code TEXT UNIQUE NOT NULL, newEmail TEXT UNIQUE NOT NULL, id TEXT UNIQUE NOT NULL);COMMIT;";
+	$status=$db->exec($query);
+	if($status){
+		echo "DB created";
+		echo $close;
+		exit();
+	}
+}
 //Function to connect to DB
 function openDB(){
      global $location;

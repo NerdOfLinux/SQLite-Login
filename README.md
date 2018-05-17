@@ -52,7 +52,7 @@ The following variables can be set:
 * `customCSS` - location to CSS file(must be accessible by PHP script)
 * `customLogo` - location to a custom logo(not checked, be sure the filename is correct)
 
-## Notes:
+# Notes:
 
 I build this using things such as:
 
@@ -70,6 +70,7 @@ Upon successful login, the following variables are set:
 * `id` is set to the rowid in sqlite, which is mainly used when updating user info
 * `email` is set to the user's email
 
+
 ## SQLite is powerful enough for this
 Many people will likely think that SQLite is too weak for use in a production website, well, it's not. According to the [SQLite appropriate uses](https://www.sqlite.org/whentouse.html):
 
@@ -84,6 +85,38 @@ Also, according to the [FAQs](https://www.sqlite.org/faq.html#q19):
 > Actually, SQLite will easily do 50,000 or more INSERT statements per second on an average desktop computer.
 
 Which means SQLite can handle hundreds to thousands of new users per second, which is very unlikely to get even on a popular website.
+
+# Integration examples
+Since it's **highly recommended** to use a separate database for everything else, here's a few integration examples:
+
+## Require user to be logged in:
+```php
+<?php
+if(!isset($_SESSION['loggedIn'])){
+  echo "Please <a href='/account.php'> log in </a> to continue.";
+  exit();
+}
+//Your other code here
+```
+
+## Use a user's username
+```php
+<?php
+//Set username variable
+$username=$_SESSION['userName'];
+echo "Welcome, $username";
+?>
+```
+
+## Send a user an email
+```php
+<?php
+//Set some vars
+$username=$_SESSION['userName'];
+$email=$_SESSION['email'];
+mail($email, "Hello, $username", "Dear $username,\nThis is a test email\nSincerely,\nPHP mail function");
+?>
+```
 
 # This is NOT yet ready to be used on a real site
 This is in alpha stages, and will likely have a ton of issues.
